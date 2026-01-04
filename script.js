@@ -81,7 +81,7 @@ let startTime = 0;
 let quizStartTime = 0;
 let questionStartTime = 0;
 
-// Expanded Questions Database (Same as before, but enhanced for UI)
+// Expanded Questions Database
 const questionsDatabase = [
     // ========== EASY QUESTIONS (5) ==========
     // Science - Easy
@@ -604,21 +604,6 @@ function startQuiz() {
     questionStartTime = Date.now();
     totalTimeUsed = 0;
     
-    // Filter questions based on selected category and difficulty
-    quizQuestions = questionsDatabase.filter(q => {
-        const categoryMatch = selectedCategory === 'all' || q.category === selectedCategory;
-        const difficultyMatch = selectedDifficulty === 'all' || q.difficulty === selectedDifficulty;
-        return categoryMatch && difficultyMatch;
-    });
-    
-    // If no questions match the filter, use all questions
-    if (quizQuestions.length === 0) {
-        quizQuestions = [...questionsDatabase];
-    }
-    
-    // Randomize questions and options
-    quizQuestions = shuffleArray(quizQuestions);
-    
     // Determine how many questions to show based on difficulty
     let questionCount;
     switch(selectedDifficulty) {
@@ -626,15 +611,51 @@ function startQuiz() {
             questionCount = 5;
             break;
         case 'medium':
+            questionCount = 10;
+            break;
         case 'hard':
             questionCount = 10;
             break;
-        default:
-            questionCount = 8; // For 'all' difficulty
+        default: // 'all'
+            questionCount = 15;
     }
     
-    // Limit to the appropriate number of questions
-    quizQuestions = quizQuestions.slice(0, questionCount);
+    // First, get all questions that match the category
+    let filteredQuestions = questionsDatabase.filter(q => {
+        const categoryMatch = selectedCategory === 'all' || q.category === selectedCategory;
+        return categoryMatch;
+    });
+    
+    // If no questions match the category, use all questions
+    if (filteredQuestions.length === 0) {
+        filteredQuestions = [...questionsDatabase];
+    }
+    
+    // Then filter by difficulty if needed (not for 'all' difficulty)
+    if (selectedDifficulty !== 'all') {
+        filteredQuestions = filteredQuestions.filter(q => q.difficulty === selectedDifficulty);
+        
+        // If we don't have enough questions of the selected difficulty,
+        // fill with questions from other difficulties
+        if (filteredQuestions.length < questionCount) {
+            const otherQuestions = questionsDatabase.filter(q => {
+                const categoryMatch = selectedCategory === 'all' || q.category === selectedCategory;
+                const difficultyNotMatch = q.difficulty !== selectedDifficulty;
+                return categoryMatch && difficultyNotMatch;
+            });
+            
+            // Shuffle other questions and add enough to reach the target count
+            const shuffledOthers = shuffleArray(otherQuestions);
+            const neededCount = questionCount - filteredQuestions.length;
+            const additionalQuestions = shuffledOthers.slice(0, neededCount);
+            
+            filteredQuestions = [...filteredQuestions, ...additionalQuestions];
+        }
+    }
+    
+    // Randomize questions and limit to the appropriate number
+    filteredQuestions = shuffleArray(filteredQuestions);
+    quizQuestions = filteredQuestions.slice(0, questionCount);
     
     // Initialize user answers array
     userAnswers = new Array(quizQuestions.length).fill(null);
