@@ -7,7 +7,7 @@ It allows users to select categories, set difficulty levels, use timers, and tra
 
 🌐 Live Demo
 
-🔗 https://lnkd.in/gU78p-uM
+🔗[ https://lnkd.in/gU78p-uM](https://vatsasarthak.github.io/Quiz_Game/)
 
 ✨ Features
 
