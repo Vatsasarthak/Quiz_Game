@@ -142,5 +142,3 @@ If you like this project:
 💡 Future improvements coming
 
 ---
-
-Agar chaho to main isme **preview GIF, visitor counter, GitHub stats, and portfolio badge** bhi add kar sakta hoon — jo recruiters ko impress karega.
